@@ -21,7 +21,6 @@ end)
 
 -- Request_checker
 local function req_check_post(req)
-	print('reqQQQ', req['key'], req['value'])
 	if ((req['key'] == nil) or (type(req['key']) ~= 'string')) then
         	log.info("Error: incorrect key!")
         	return true
@@ -33,13 +32,13 @@ local function req_check_post(req)
 end
 
 local function req_check_put(req)
-	print('reqQQQ', req['key'], req['value'])
 	if ((req['value'] == nil) or (type(req['value']) ~= 'string')) then
         	log.info("Error: incorrect value!")
 		return true
 	end
 	return false
 end
+
 -- POST handler
 local function poster(self)
 	local jkv = json.decode(self:read())
@@ -102,7 +101,7 @@ local function deletter(self)
 		    		</html>]]
 		};
 	end
-	
+	-- Delete key-value 
 	box.space.massive:delete(key)
 	log.info("Record {" .. kv[1] .."/"..kv[2].."} was deleted successfully.")
 	return { status = 200, headers = { ['content-type'] = 'text/html; charset=utf8' }, 
@@ -134,7 +133,7 @@ local function putter(self)
 		    		</html>]]
 		};
 	end
-	
+	-- Update key-value 
 	box.space.massive:update(key, {{'=', 2, jkv['value']}})
 	log.info("Record {" .. kv[1] .."/"..kv[2].."} was updated successfully.")
 	return { status = 200, headers = { ['content-type'] = 'text/html; charset=utf8' }, 
@@ -144,7 +143,7 @@ local function putter(self)
 		}
 end
 
--- Server and routes initialisation
+-- Server and routes initialization
 local server = httpd.new('127.0.0.1', 8080, {log_requests = true, log_errors = true})  
 router:route({ path = '/kv', method = 'POST' }, poster)
 router:route({ path = '/kv/:key', method = 'GET' }, getter)
